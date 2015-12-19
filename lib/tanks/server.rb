@@ -51,6 +51,7 @@ module Tanks
           add_player(msg["from"])
         when "start_move"
           p = find_player(msg["id"])
+          next unless p
           p.set_orientation(msg["orientation"])
           p.start
           network.broadcast_to(@address_map.keys, {
@@ -60,6 +61,7 @@ module Tanks
           })
         when "stop_move"
           p = find_player(msg["id"])
+          next unless p
           p.stop
           network.broadcast_to(@address_map.keys, {
             id: p.id,

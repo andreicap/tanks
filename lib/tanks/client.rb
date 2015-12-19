@@ -14,6 +14,23 @@ module Tanks
       @network = Network.new(4001 + rand(20))
       @server = Socket.sockaddr_in(4000, server_host)
 
+
+      @projectiles = []
+      @keyboard = Keyboard.new(
+        Gosu::KbSpace,
+        Gosu::KbUp,
+        Gosu::KbDown,
+        Gosu::KbLeft,
+        Gosu::KbRight
+      )
+    end
+
+    def run
+      show
+      join_game
+    end
+
+    def join_game
       send_to_server({type: :join})
 
       loop do
@@ -31,21 +48,6 @@ module Tanks
           break
         end
       end
-
-      puts @players.inspect
-
-      @projectiles = []
-      @keyboard = Keyboard.new(
-        Gosu::KbSpace,
-        Gosu::KbUp,
-        Gosu::KbDown,
-        Gosu::KbLeft,
-        Gosu::KbRight
-      )
-    end
-
-    def run
-      show
     end
 
     def send_to_server(msg)
