@@ -78,7 +78,7 @@ module Tanks
       id = next_id
       x = rand(800)
       y = rand(600)
-      player = Player.new(id, x, y)
+      player = Player.new(id, x, y, 'up', 0)
 
       @address_map.keys.each do |addr|
         network.send_to(addr, {
@@ -94,7 +94,15 @@ module Tanks
         id: id,
         x: x,
         y: y,
-        players: @players.map{ |p| {id: p.id, x: p.x, y: p.y} }
+        players: @players.map { |p|
+          {
+            id: p.id,
+            x: p.x,
+            y: p.y,
+            orientation: p.get_orientation,
+            speed: p.speed
+          }
+        }
       })
 
       @players << player

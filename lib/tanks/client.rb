@@ -21,11 +21,11 @@ module Tanks
         next unless msg
 
         if "join_confirm" == msg["type"]
-          @player = Player.new(msg["id"], msg["x"], msg["y"])
+          @player = Player.new(msg["id"], msg["x"], msg["y"], 'up', 0)
           @players = [@player]
 
           msg["players"].each do |p|
-            @players << Player.new(p["id"], p["x"], p["y"])
+            @players << Player.new(p["id"], p["x"], p["y"], p["orientation"], p["speed"])
           end
 
           break
@@ -124,7 +124,7 @@ module Tanks
       while msg = network.next_message
         case msg["type"]
         when "joined"
-          @players << Player.new(msg["id"], msg["x"], msg["y"])
+          @players << Player.new(msg["id"], msg["x"], msg["y"], 'up', 0)
         when "started_move"
           p = find_player(msg["id"])
           next if p.id == @player.id

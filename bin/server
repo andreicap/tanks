@@ -2,5 +2,6 @@
 
 require "bundler/setup"
 require "tanks"
+require 'pry'
 
 Tanks::Server.new.run
