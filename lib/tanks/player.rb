@@ -65,7 +65,7 @@ module Tanks
     end
 
     def shoot
-      Projectile.new(@x, @y, @ox * 5, @oy * 5, owner)
+      Projectile.new(@x, @y, @ox * 5, @oy * 5, self)
     end
 
     def draw
