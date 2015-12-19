@@ -23,13 +23,27 @@ module Tanks
       @listener.kill
     end
 
+    def has_messages?
+      !datagram_buffer.empty?
+    end
+
+    def next_message
+      str, info = datagram_buffer.shift
+      return unless str
+      m = JSON.parse(str)
+      m["from"] = Addrinfo.new(info)
+      m
+    rescue JSON::ParserError
+      nil
+    end
+
     def get_messages
       msgs = datagram_buffer.map do |str, info|
         m = JSON.parse(str)
         m["from"] = info
         m
       end
-      datagram_buffer = []
+      datagram_buffer.clear
       msgs
     end
 
@@ -38,7 +52,7 @@ module Tanks
     end
 
     def send_to(address, event)
-      @udp_socket.send_to(JSON.generate(event), 0, address)
+      @udp_socket.send(JSON.generate(event), 0, address)
     end
   end
 end

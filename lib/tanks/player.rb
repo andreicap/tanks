@@ -3,7 +3,10 @@ require 'gosu'
 
 module Tanks
   class Player
-    def initialize
+    attr_reader :id
+
+    def initialize(id)
+      @id = id
       @image = Gosu::Image.new(Tanks.media("starfighter.bmp"))
       @x = 400
       @y = 300

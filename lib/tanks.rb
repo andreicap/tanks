@@ -10,3 +10,7 @@ module Tanks
   end
 end
 
+require "tanks/server"
+require "tanks/client"
+require "tanks/network"
+
