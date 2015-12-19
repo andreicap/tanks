@@ -9,26 +9,23 @@ module Tanks
   class Client < Gosu::Window
     attr_reader :keyboard, :network
 
-    def initialize
+    def initialize(server_host)
       super 800, 600
       @network = Network.new(4001 + rand(20))
-      @server = Socket.sockaddr_in(4000, 'localhost')
+      @server = Socket.sockaddr_in(4000, server_host)
 
-      @network.send_to(@server, {type: :join})
-
-      @font = Gosu::Font.new(40)
-      @game_started = false
+      send_to_server({type: :join})
 
       loop do
         msg = @network.next_message
         next unless msg
 
         if "join_confirm" == msg["type"]
-          @player = Player.new(msg["id"])
+          @player = Player.new(msg["id"], msg["x"], msg["y"])
           @players = [@player]
 
-          msg["players"].each do |id|
-            @players << Player.new(id)
+          msg["players"].each do |p|
+            @players << Player.new(p["id"], p["x"], p["y"])
           end
 
           break
@@ -51,6 +48,10 @@ module Tanks
       show
     end
 
+    def send_to_server(msg)
+      network.send_to(@server, msg)
+    end
+
     def arrow_keys
       [
         Gosu::KbUp,
@@ -62,10 +63,10 @@ module Tanks
 
     def orientations
       {
-        Gosu::KbUp    => :orient_up,
-        Gosu::KbDown  => :orient_down,
-        Gosu::KbLeft  => :orient_left,
-        Gosu::KbRight => :orient_right
+        Gosu::KbUp    => :up,
+        Gosu::KbDown  => :down,
+        Gosu::KbLeft  => :left,
+        Gosu::KbRight => :right
       }
     end
 
@@ -78,14 +79,8 @@ module Tanks
     end
 
     def draw
-      if @game_started
-        @player.draw
-        @projectiles.each(&:draw)
-      else
-        @players.each.with_index do |p, i|
-          @font.draw(p.id, 10, 10 + i * 40, 1)
-        end
-      end
+      @players.each(&:draw)
+      @projectiles.each(&:draw)
     end
 
     def handle_keyboard
@@ -93,22 +88,53 @@ module Tanks
 
       if keyboard.pressed? Gosu::KbSpace
         @projectiles << @player.shoot
+        send_to_server({
+          type: :shoot,
+          id: @player.id
+        })
       end
 
       arrow_keys.each do |k|
         if keyboard.pressed?(k)
-          @player.public_send(orientations[k])
+          @player.set_orientation(orientations[k])
           @player.start
+          send_to_server({
+            id: @player.id,
+            type: :start_move,
+            orientation: orientations[k]
+          })
         end
       end
 
-      @player.stop unless arrow_keys.any? { |k| keyboard.down?(k) }
+      if arrow_keys.any? { |k| keyboard.released?(k) }
+        @player.stop
+        send_to_server({
+          id: @player.id,
+          type: :stop_move
+        })
+      end
     end
+
+    def find_player(id)
+      @players.find { |p| p.id == id }
+    end
+
 
     def handle_network
       while msg = network.next_message
-        if "joined" == msg["type"]
-          @players << Player.new(msg["id"])
+        case msg["type"]
+        when "joined"
+          @players << Player.new(msg["id"], msg["x"], msg["y"])
+        when "started_move"
+          p = find_player(msg["id"])
+          next if p.id == @player.id
+          p.set_orientation(msg["orientation"])
+          p.start
+        when "stoped_move"
+          p = find_player(msg["id"])
+          next if p.id == @player.id
+          p.stop
+        else
         end
       end
     end

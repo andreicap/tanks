@@ -3,13 +3,13 @@ require 'gosu'
 
 module Tanks
   class Player
-    attr_reader :id
+    attr_reader :id, :x, :y
 
-    def initialize(id)
+    def initialize(id, x, y)
       @id = id
       @image = Gosu::Image.new(Tanks.media("starfighter.bmp"))
-      @x = 400
-      @y = 300
+      @x = x
+      @y = y
       @ox = 0
       @oy = -1
       @speed = 0
@@ -44,8 +44,28 @@ module Tanks
       @ox, @oy = 1, 0
     end
 
+    def set_orientation(orientation)
+      public_send("orient_#{orientation}")
+    end
+
+    def get_orientation
+      if 0 == @ox
+        if @oy > 0
+          'down'
+        else
+          'up'
+        end
+      else
+        if @ox > 0
+          'right'
+        else
+          'left'
+        end
+      end
+    end
+
     def shoot
-      Projectile.new(@x, @y, @ox * 5, @oy * 5)
+      Projectile.new(@x, @y, @ox * 5, @oy * 5, owner)
     end
 
     def draw

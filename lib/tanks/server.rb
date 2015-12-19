@@ -36,7 +36,7 @@ module Tanks
     end
 
     def update
-
+      @players.each(&:update)
     end
 
     def render
@@ -49,26 +49,52 @@ module Tanks
         case msg["type"]
         when "join"
           add_player(msg["from"])
+        when "start_move"
+          p = find_player(msg["id"])
+          p.set_orientation(msg["orientation"])
+          p.start
+          network.broadcast_to(@address_map.keys, {
+            id: p.id,
+            type: :started_move,
+            orientation: p.get_orientation
+          })
+        when "stop_move"
+          p = find_player(msg["id"])
+          p.stop
+          network.broadcast_to(@address_map.keys, {
+            id: p.id,
+            type: :stoped_move
+          })
         else
         end
       end
     end
 
+    def find_player(id)
+      @players.find { |p| p.id == id }
+    end
+
     def add_player(addr_info)
       id = next_id
-      player = Player.new(id)
+      x = rand(800)
+      y = rand(600)
+      player = Player.new(id, x, y)
 
       @address_map.keys.each do |addr|
         network.send_to(addr, {
           type: :joined,
-          id: id
+          id: id,
+          x: x,
+          y: y
         })
       end
 
       network.send_to(addr_info, {
         type: :join_confirm,
         id: id,
-        players: @players.map(&:id)
+        x: x,
+        y: y,
+        players: @players.map{ |p| {id: p.id, x: p.x, y: p.y} }
       })
 
       @players << player
