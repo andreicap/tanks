@@ -14,7 +14,7 @@ module Tanks
       @network = Network.new(4001 + rand(20))
       @server = Socket.sockaddr_in(4000, server_host)
 
-
+      @players = []
       @projectiles = []
       @keyboard = Keyboard.new(
         Gosu::KbSpace,
@@ -27,7 +27,6 @@ module Tanks
 
     def run
       show
-      join_game
     end
 
     def join_game
@@ -39,7 +38,7 @@ module Tanks
 
         if "join_confirm" == msg["type"]
           @player = Player.new(msg["id"], msg["x"], msg["y"], 'up', 0)
-          @players = [@player]
+          @players << @player
 
           msg["players"].each do |p|
             @players << Player.new(p["id"], p["x"], p["y"], p["orientation"], p["speed"])
@@ -73,11 +72,15 @@ module Tanks
     end
 
     def update
-      handle_network
-      handle_keyboard
+      if @players.empty?
+        join_game
+      else
+        handle_network
+        handle_keyboard
 
-      @players.each(&:update)
-      @projectiles.each(&:update)
+        @players.each(&:update)
+        @projectiles.each(&:update)
+      end
     end
 
     def draw
