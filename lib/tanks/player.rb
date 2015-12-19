@@ -44,7 +44,6 @@ module Tanks
     end
 
     def set_orientation(orientation)
-      puts orientation
       public_send("orient_#{orientation}")
     end
 
