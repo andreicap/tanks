@@ -4,4 +4,4 @@ require "bundler/setup"
 require "tanks"
 require 'pry'
 
-Tanks::Client.new(ARGV[0] = "127.0.0.1").run
+Tanks::Client.new(ARGV[0]).run
