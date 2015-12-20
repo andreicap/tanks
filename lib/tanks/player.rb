@@ -26,11 +26,13 @@ module Tanks
     end
 
     def start
+      Gosu::Sample.new("media/audio/acceleration.ogg").play
       @player_animation.start
       @speed = 1
     end
 
     def stop
+      Gosu::Sample.new("media/audio/breaking.ogg").play
       @player_animation.stop
       @speed = 0
     end
