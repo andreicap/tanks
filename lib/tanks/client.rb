@@ -102,15 +102,6 @@ module Tanks
 
       arrow_keys.each do |k|
         if keyboard.pressed?(k)
-          # Tank acceleration sound effect
-          # Gosu::Sample.new("media/audio/acceleration.ogg").play
-
-          # Tank driving sound effect
-          # Gosu::Sample.new("media/audio/drive.ogg").play
-
-          # Tank breaking sound effect at the end
-          # Gosu::Sample.new("media/audio/breaking.ogg").play
-
           @player.set_orientation(orientations[k])
           @player.start
           send_to_server({

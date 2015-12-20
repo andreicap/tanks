@@ -1,13 +1,18 @@
 
-require 'gosu'
+require "gosu"
+require "tanks/animation"
 
 module Tanks
   class Player
     attr_reader :id, :x, :y, :speed
-
     def initialize(id, x, y, orientation, speed)
       @id = id
-      @image = Gosu::Image.new(Tanks.media("starfighter.bmp"))
+
+      @frames = [Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t1.png")),
+        Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t2.png"))]
+
+      @player_animation = Animation.new @frames, 20
+
       @x = x
       @y = y
       set_orientation(orientation)
@@ -21,11 +26,13 @@ module Tanks
 
     def start
       Gosu::Sample.new("media/audio/acceleration.ogg").play
+      @player_animation.start
       @speed = 1
     end
 
     def stop
       Gosu::Sample.new("media/audio/breaking.ogg").play
+      @player_animation.stop
       @speed = 0
     end
 
@@ -74,7 +81,7 @@ module Tanks
     end
 
     def draw
-      @image.draw_rot(@x, @y, 1, Gosu::angle(0, 0, @ox, @oy))
+      @player_animation.current_frame.draw_rot(@x, @y, 1, Gosu::angle(0, 0, @ox, @oy))
     end
   end
 end
