@@ -31,7 +31,7 @@ module Tanks
       return nil if datagram_buffer.empty?
       str, info = datagram_buffer.shift
       m = JSON.parse(str)
-      m["from"] = Addrinfo.new(info)
+      m["from"] = Addrinfo.new(info).to_sockaddr
       m
     rescue JSON::ParserError
       nil
@@ -50,6 +50,7 @@ module Tanks
     end
 
     def send_to(address, event)
+      puts address
       @udp_socket.send(JSON.generate(event), 0, address)
     end
   end
