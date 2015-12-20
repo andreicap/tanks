@@ -13,7 +13,7 @@ module Tanks
       @players = []
       @address_map = {}
       @projectiles = []
-      @client_monitor = ClientMonitor.new(@network, @address_map)
+      @client_monitor = ClientMonitor.new(self, @network, @address_map)
     end
 
     def run
@@ -26,7 +26,6 @@ module Tanks
         lag += elapsed
 
         handle_network
-        handle_dead_clients
 
         while lag >= MS_PER_UPDATE
           update
@@ -40,6 +39,7 @@ module Tanks
 
     def update
       @players.each(&:update)
+      @client_monitor.update
     end
 
     def render
@@ -72,9 +72,11 @@ module Tanks
           network.broadcast_to(@address_map.keys, {
             type: :stoped_move,
             id: p.id#,
-            # x: p.x,
-            # y: p.y
+            #x: p.x,
+            #y: p.y
           })
+        when "pong"
+          @client_monitor.pong_from(msg["from"])
         else
         end
       end
@@ -128,8 +130,12 @@ module Tanks
       network.shutdown
     end
 
-    def handle_dead_clients
+    def handle_dead_client(address)
+      puts "Dead client: #{address.ip_address}"
+    end
 
+    def handle_slow_client(address)
+      puts "Slow client: #{address.ip_address}"
     end
 
   end
