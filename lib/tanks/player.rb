@@ -4,11 +4,11 @@ require "tanks/animation"
 
 module Tanks
   class Player
-    attr_reader :id, :x, :y, :speed
+    attr_reader :id, :x, :y, :speed, :size
     def initialize(id, x, y, orientation, speed)
       @id = id
 
-      @frames = [Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t1.png")), 
+      @frames = [Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t1.png")),
         Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t2.png"))]
 
       @player_animation = Animation.new @frames, 20
@@ -17,6 +17,7 @@ module Tanks
       @y = y
       set_orientation(orientation)
       @speed = speed
+      @size = 32
     end
 
     def update

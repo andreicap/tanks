@@ -92,7 +92,7 @@ module Tanks
       keyboard.update
 
       if keyboard.pressed? Gosu::KbSpace
-        @projectiles << @player.shoot
+        # @projectiles << @player.shoot
         send_to_server({
           type: :shoot,
           id: @player.id
@@ -101,8 +101,8 @@ module Tanks
 
       arrow_keys.each do |k|
         if keyboard.pressed?(k)
-          @player.set_orientation(orientations[k])
-          @player.start
+          # @player.set_orientation(orientations[k])
+          # @player.start
           send_to_server({
             id: @player.id,
             type: :start_move,
@@ -112,7 +112,7 @@ module Tanks
       end
 
       if arrow_keys.any? { |k| keyboard.released?(k) }
-        @player.stop
+        # @player.stop
         send_to_server({
           id: @player.id,
           type: :stop_move
@@ -142,6 +142,12 @@ module Tanks
           p.stop
         when "ping"
           send_to_server({type: :pong})
+        when "has_shot"
+          p = find_player(msg["id"])
+          @projectiles << p.shoot
+        when "respawn"
+          p = find_player(msg["id"])
+          p.set_position(msg["x"], msg["y"])
         else
         end
       end
