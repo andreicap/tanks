@@ -20,10 +20,12 @@ module Tanks
     end
 
     def start
+      Gosu::Sample.new("media/audio/acceleration.ogg").play
       @speed = 1
     end
 
     def stop
+      Gosu::Sample.new("media/audio/breaking.ogg").play
       @speed = 0
     end
 

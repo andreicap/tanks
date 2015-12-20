@@ -31,7 +31,7 @@ module Tanks
 
     def join_game
       send_to_server({type: :join})
-
+      Gosu::Sample.new("media/audio/stage_start.ogg").play
       loop do
         msg = @network.next_message
         next unless msg
@@ -92,6 +92,7 @@ module Tanks
       keyboard.update
 
       if keyboard.pressed? Gosu::KbSpace
+        Gosu::Sample.new("media/audio/bullet_shot.ogg").play
         @projectiles << @player.shoot
         send_to_server({
           type: :shoot,
@@ -101,6 +102,15 @@ module Tanks
 
       arrow_keys.each do |k|
         if keyboard.pressed?(k)
+          # Tank acceleration sound effect
+          # Gosu::Sample.new("media/audio/acceleration.ogg").play
+
+          # Tank driving sound effect
+          # Gosu::Sample.new("media/audio/drive.ogg").play
+
+          # Tank breaking sound effect at the end
+          # Gosu::Sample.new("media/audio/breaking.ogg").play
+
           @player.set_orientation(orientations[k])
           @player.start
           send_to_server({
