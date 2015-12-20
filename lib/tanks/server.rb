@@ -1,6 +1,7 @@
 
 require 'tanks/network'
 require 'tanks/player'
+require 'tanks/client_monitor'
 
 module Tanks
   class Server
@@ -12,6 +13,7 @@ module Tanks
       @players = []
       @address_map = {}
       @projectiles = []
+      @client_monitor = ClientMonitor.new(@network, @address_map)
     end
 
     def run
@@ -24,11 +26,13 @@ module Tanks
         lag += elapsed
 
         handle_network
+        handle_dead_clients
 
         while lag >= MS_PER_UPDATE
           update
           lag -= MS_PER_UPDATE
         end
+
 
         render
       end
@@ -122,6 +126,10 @@ module Tanks
 
     def shutdown
       network.shutdown
+    end
+
+    def handle_dead_clients
+
     end
 
   end

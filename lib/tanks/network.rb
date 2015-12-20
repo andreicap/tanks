@@ -38,12 +38,10 @@ module Tanks
     end
 
     def get_messages
-      msgs = datagram_buffer.map do |str, info|
-        m = JSON.parse(str)
-        m["from"] = info
-        m
+      msgs = []
+      until datagram_buffer.empty?
+        msgs << next_message
       end
-      datagram_buffer.clear
       msgs
     end
 
