@@ -11,7 +11,7 @@ module Tanks
       @frames = [Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t1.png")), 
         Gosu::Image.new(Tanks.media("images/tank_player1_up_c0_t2.png"))]
 
-      @player_animation = Animation.new @frames, 500
+      @player_animation = Animation.new @frames, 20
 
       @x = x
       @y = y
