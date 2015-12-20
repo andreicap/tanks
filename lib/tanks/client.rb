@@ -31,7 +31,7 @@ module Tanks
 
     def join_game
       send_to_server({type: :join})
-
+      Gosu::Sample.new("media/audio/stage_start.ogg").play
       loop do
         msg = @network.next_message
         next unless msg
@@ -92,6 +92,7 @@ module Tanks
       keyboard.update
 
       if keyboard.pressed? Gosu::KbSpace
+        Gosu::Sample.new("media/audio/bullet_shot.ogg").play
         @projectiles << @player.shoot
         send_to_server({
           type: :shoot,
