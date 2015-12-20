@@ -10,7 +10,7 @@ module Tanks
     attr_reader :keyboard, :network
 
     def initialize(server_host)
-      super 800, 600
+      super 640, 480
       @network = Network.new(4001 + rand(20))
       @server = Socket.sockaddr_in(4000, server_host)
 
@@ -127,18 +127,21 @@ module Tanks
 
     def handle_network
       while msg = network.next_message
+        puts msg
         case msg["type"]
         when "joined"
           @players << Player.new(msg["id"], msg["x"], msg["y"], 'up', 0)
         when "started_move"
           p = find_player(msg["id"])
-          next if p.id == @player.id
           p.set_orientation(msg["orientation"])
+          p.set_position(msg["x"], msg["y"])
           p.start
         when "stoped_move"
           p = find_player(msg["id"])
-          next if p.id == @player.id
+          #p.set_position(msg["x"], msg["y"])
           p.stop
+        when "ping"
+          send_to_server({type: :pong})
         else
         end
       end

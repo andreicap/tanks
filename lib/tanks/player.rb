@@ -47,6 +47,10 @@ module Tanks
       public_send("orient_#{orientation}")
     end
 
+    def set_position(x, y)
+      @x, @y = x, y
+    end
+
     def get_orientation
       if 0 == @ox
         if @oy > 0

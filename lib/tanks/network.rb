@@ -4,7 +4,7 @@ require 'socket'
 
 module Tanks
   class Network
-    attr_reader :game, :clients, :datagram_buffer
+    attr_reader :clients, :datagram_buffer
 
     def initialize(port = 4000)
       @udp_socket = UDPSocket.new(Socket::AF_INET)
@@ -28,8 +28,8 @@ module Tanks
     end
 
     def next_message
+      return nil if datagram_buffer.empty?
       str, info = datagram_buffer.shift
-      return unless str
       m = JSON.parse(str)
       m["from"] = Addrinfo.new(info)
       m

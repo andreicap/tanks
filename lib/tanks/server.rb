@@ -19,12 +19,11 @@ module Tanks
       lag = 0.0
       loop do
         current = Time.now
-        elapsed = current - previous
+        elapsed = (current - previous) * 1000
         previous = current
         lag += elapsed
 
         handle_network
-        #puts players.map(&:id).inspect
 
         while lag >= MS_PER_UPDATE
           update
@@ -54,9 +53,12 @@ module Tanks
           next unless p
           p.set_orientation(msg["orientation"])
           p.start
+          puts "#{p.x} #{p.y}"
           network.broadcast_to(@address_map.keys, {
-            id: p.id,
             type: :started_move,
+            id: p.id,
+            x: p.x,
+            y: p.y,
             orientation: p.get_orientation
           })
         when "stop_move"
@@ -64,8 +66,10 @@ module Tanks
           next unless p
           p.stop
           network.broadcast_to(@address_map.keys, {
-            id: p.id,
-            type: :stoped_move
+            type: :stoped_move,
+            id: p.id#,
+            # x: p.x,
+            # y: p.y
           })
         else
         end
@@ -78,8 +82,8 @@ module Tanks
 
     def add_player(addr_info)
       id = next_id
-      x = rand(800)
-      y = rand(600)
+      x = rand(600)
+      y = rand(400)
       player = Player.new(id, x, y, 'up', 0)
 
       @address_map.keys.each do |addr|
